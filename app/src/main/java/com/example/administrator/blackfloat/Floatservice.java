@@ -46,6 +46,14 @@ public class Floatservice extends Service {
                 floatView.setVisibility(View.GONE);
             }
         });
+
+        floatView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                stopService(new Intent(Floatservice.this,Floatservice.class));
+                return true;
+            }
+        });
     }
 
     private void startfloat() {
@@ -94,4 +102,10 @@ public class Floatservice extends Service {
             floatView.setVisibility(View.GONE);
         }
     };
+
+    @Override
+    public void onDestroy()
+    {
+        windowManager.removeView(floatView);
+    }
 }
