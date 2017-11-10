@@ -38,6 +38,14 @@ public class Floatservice extends Service {
     public void onCreate() {
         floatservicethis = this;
         startfloat();
+        new Thread(runnable).start();
+
+        floatView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                floatView.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void startfloat() {
@@ -52,28 +60,38 @@ public class Floatservice extends Service {
         params.x = 100;
         params.y = 100;
         windowManager.addView(floatView, params);
-
-        floatView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                floatView.setVisibility(View.GONE);
-                handler.removeCallbacks(runnable);
-                handler.postDelayed(runnable, 2000);
-            }
-        });
     }
 
     private Runnable runnable  = new Runnable() {
         @Override
         public void run() {
-            if (floatView.getVisibility() == View.GONE) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        floatView.setVisibility(View.VISIBLE);
-                    }
-                });
+            while (true) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (IsHome.isHome(getApplicationContext())) {
+                    handler.post(gonerunn);
+                    continue;
+                }
+                if (floatView.getVisibility() == View.GONE) {
+                    handler.post(visiblerunn);
+                }
             }
+        }
+    };
+
+    Runnable visiblerunn = new Runnable() {
+        @Override
+        public void run() {
+            floatView.setVisibility(View.VISIBLE);
+        }
+    };
+    Runnable gonerunn = new Runnable() {
+        @Override
+        public void run() {
+            floatView.setVisibility(View.GONE);
         }
     };
 }
