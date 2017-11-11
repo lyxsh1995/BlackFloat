@@ -27,6 +27,9 @@ public class Floatservice extends Service {
     private TimerTask task;
 
     Handler handler = new Handler();
+    private Thread mainth;
+
+    private boolean exit = true;
 
     @Nullable
     @Override
@@ -38,7 +41,8 @@ public class Floatservice extends Service {
     public void onCreate() {
         floatservicethis = this;
         startfloat();
-        new Thread(runnable).start();
+        mainth = new Thread(runnable);
+        mainth.start();
 
         floatView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,7 +54,7 @@ public class Floatservice extends Service {
         floatView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                stopService(new Intent(Floatservice.this,Floatservice.class));
+                stopSelf();
                 return true;
             }
         });
@@ -73,7 +77,7 @@ public class Floatservice extends Service {
     private Runnable runnable  = new Runnable() {
         @Override
         public void run() {
-            while (true) {
+            while (exit) {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
@@ -106,6 +110,7 @@ public class Floatservice extends Service {
     @Override
     public void onDestroy()
     {
+        exit = false;
         windowManager.removeView(floatView);
     }
 }
