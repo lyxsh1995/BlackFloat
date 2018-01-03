@@ -1,6 +1,7 @@
 package com.example.administrator.blackfloat;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.provider.Settings;
@@ -9,6 +10,10 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,21 +24,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //判断是否安卓6.0
-        if (Build.VERSION.SDK_INT >= 23)
-        {
+        if (Build.VERSION.SDK_INT >= 23) {
             //判断是否已经授权
-            if (Settings.canDrawOverlays(MainActivity.this))
-            {
-                startService(new Intent(MainActivity.this,Floatservice.class));
-            } else
-            {
+            if (Settings.canDrawOverlays(MainActivity.this)) {
+                startService(new Intent(MainActivity.this, Floatservice.class));
+            } else {
                 //打开系统悬浮窗设置页面
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                 startActivity(intent);
             }
-        } else
-        {
-            startService(new Intent(MainActivity.this,Floatservice.class));
+        } else {
+            startService(new Intent(MainActivity.this, Floatservice.class));
         }
+
+        Pack pack = new Pack(MainActivity.this);
+        MyAdapet adapter = new MyAdapet(MainActivity.this, pack.getAllApps());
+        ListView listView = (ListView) findViewById(R.id.listview);
+        listView.setAdapter(adapter);
     }
 }
