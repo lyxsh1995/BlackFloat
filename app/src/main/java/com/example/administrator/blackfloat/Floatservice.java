@@ -1,7 +1,9 @@
 package com.example.administrator.blackfloat;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.IBinder;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,7 +29,12 @@ public class Floatservice extends Service {
     private Timer timer;
     private TimerTask task;
 
+    HashMap hashMap;
+
     Handler handler = new Handler();
+    private Thread mainth;
+
+    private boolean exit = true;
 
     @Nullable
     @Override
@@ -37,7 +45,27 @@ public class Floatservice extends Service {
     @Override
     public void onCreate() {
         floatservicethis = this;
+        SharedPreferences sp = getSharedPreferences("app", Context.MODE_PRIVATE);
+        hashMap = (HashMap) sp.getAll();
+
         startfloat();
+        mainth = new Thread(runnable);
+        mainth.start();
+
+        floatView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                floatView.setVisibility(View.GONE);
+            }
+        });
+
+        floatView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                stopSelf();
+                return true;
+            }
+        });
     }
 
     private void startfloat() {
@@ -52,28 +80,45 @@ public class Floatservice extends Service {
         params.x = 100;
         params.y = 100;
         windowManager.addView(floatView, params);
-
-        floatView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                floatView.setVisibility(View.GONE);
-                handler.removeCallbacks(runnable);
-                handler.postDelayed(runnable, 2000);
-            }
-        });
     }
 
     private Runnable runnable  = new Runnable() {
         @Override
         public void run() {
-            if (floatView.getVisibility() == View.GONE) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        floatView.setVisibility(View.VISIBLE);
-                    }
-                });
+            while (exit) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (IsHome.isHome(getApplicationContext())) {
+                    handler.post(gonerunn);
+                    continue;
+                }
+                if (floatView.getVisibility() == View.GONE && !IsHome.isapp(getApplicationContext(),hashMap)) {
+                    handler.post(visiblerunn);
+                }
             }
         }
     };
+
+    Runnable visiblerunn = new Runnable() {
+        @Override
+        public void run() {
+            floatView.setVisibility(View.VISIBLE);
+        }
+    };
+    Runnable gonerunn = new Runnable() {
+        @Override
+        public void run() {
+            floatView.setVisibility(View.GONE);
+        }
+    };
+
+    @Override
+    public void onDestroy()
+    {
+        exit = false;
+        windowManager.removeView(floatView);
+    }
 }
