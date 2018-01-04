@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -45,5 +46,20 @@ public class IsHome {
         ActivityManager mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> rti = mActivityManager.getRunningTasks(1);
         return names.contains(rti.get(0).topActivity.getPackageName());
+    }
+
+    /**
+     * 是否有黑名单程序
+     */
+    public static boolean isapp(Context context, HashMap hashMap)
+    {
+        if (hashMap.size()<1)
+        {
+            return true;
+        }
+        getHomes(context);
+        ActivityManager mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> rti = mActivityManager.getRunningTasks(1);
+        return hashMap.containsValue(rti.get(0).topActivity.getPackageName());
     }
 }

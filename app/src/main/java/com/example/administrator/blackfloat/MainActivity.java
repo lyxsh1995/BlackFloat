@@ -1,6 +1,8 @@
 package com.example.administrator.blackfloat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.graphics.PixelFormat;
 import android.os.Build;
@@ -13,16 +15,15 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //判断是否安卓6.0
         if (Build.VERSION.SDK_INT >= 23) {
             //判断是否已经授权
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startService(new Intent(MainActivity.this, Floatservice.class));
         }
-
+        
         Pack pack = new Pack(MainActivity.this);
         MyAdapet adapter = new MyAdapet(MainActivity.this, pack.getAllApps());
         ListView listView = (ListView) findViewById(R.id.listview);

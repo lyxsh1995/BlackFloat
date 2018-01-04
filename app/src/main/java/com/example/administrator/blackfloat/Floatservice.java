@@ -1,7 +1,9 @@
 package com.example.administrator.blackfloat;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.IBinder;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,6 +29,8 @@ public class Floatservice extends Service {
     private Timer timer;
     private TimerTask task;
 
+    HashMap hashMap;
+
     Handler handler = new Handler();
     private Thread mainth;
 
@@ -40,6 +45,9 @@ public class Floatservice extends Service {
     @Override
     public void onCreate() {
         floatservicethis = this;
+        SharedPreferences sp = getSharedPreferences("app", Context.MODE_PRIVATE);
+        hashMap = (HashMap) sp.getAll();
+
         startfloat();
         mainth = new Thread(runnable);
         mainth.start();
@@ -87,7 +95,7 @@ public class Floatservice extends Service {
                     handler.post(gonerunn);
                     continue;
                 }
-                if (floatView.getVisibility() == View.GONE) {
+                if (floatView.getVisibility() == View.GONE && !IsHome.isapp(getApplicationContext(),hashMap)) {
                     handler.post(visiblerunn);
                 }
             }

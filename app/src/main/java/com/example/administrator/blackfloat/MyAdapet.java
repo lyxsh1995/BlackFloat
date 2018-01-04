@@ -1,6 +1,8 @@
 package com.example.administrator.blackfloat;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.media.Image;
@@ -25,12 +27,15 @@ public class MyAdapet extends BaseAdapter {
     Context context;
     List<PackageInfo> list;
     PackageManager packageManager;
-    List<Integer> select;
+    private final SharedPreferences sp;
+    private final SharedPreferences.Editor editor;
+
     MyAdapet(Context context, List<PackageInfo> list){
         this.context = context;
         this.list = list;
         packageManager = context.getPackageManager();
-        select = new ArrayList<>();
+        sp = context.getSharedPreferences("app", Context.MODE_PRIVATE);
+        editor = sp.edit();
     }
 
     @Override
@@ -51,34 +56,37 @@ public class MyAdapet extends BaseAdapter {
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View mview = inflater.inflate(R.layout.appslist,viewGroup,true);
+        View mview = inflater.inflate(R.layout.appslist,null,false);
+        final ApplicationInfo info = list.get(i).applicationInfo;
         final TextView textView = mview.findViewById(R.id.list_text);
-        textView.setText(packageManager.getApplicationLabel(list.get(i).applicationInfo).toString());
+        textView.setText(packageManager.getApplicationLabel(info).toString());
+        if (sp.getAll().containsKey(packageManager.getApplicationLabel(info).toString()))
+        {
+            textView.setBackgroundColor(0xffFF7575);
+        }
 
         ImageView image = mview.findViewById(R.id.list_img);
-        image.setImageDrawable(packageManager.getApplicationIcon(list.get(i).applicationInfo));
+        image.setImageDrawable(packageManager.getApplicationIcon(info));
 
         LinearLayout layout = mview.findViewById(R.id.list_layout);
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (select.contains(i))
+                if (sp.getAll().containsKey(packageManager.getApplicationLabel(info).toString()))
                 {
                     //已经点击过了
-                    select.remove((Object)i);
-                    textView.setBackgroundColor(0x00ffffff);
+                    textView.setBackgroundColor(0xffffffff);
+                    editor.remove(textView.getText().toString());
+                    editor.apply();
                 }else
                 {
                     //没点击过
-                    select.add(i);
-                    textView.setBackgroundColor(0x00122543);
+                    textView.setBackgroundColor(0xffFF7575);
+                    editor.putString(textView.getText().toString(),info.packageName);
+                    editor.apply();
                 }
             }
         });
         return mview;
-    }
-
-    public List<Integer> getSelect() {
-        return select;
     }
 }
