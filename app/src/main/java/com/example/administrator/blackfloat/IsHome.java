@@ -55,7 +55,7 @@ public class IsHome {
     {
         if (hashMap.size()<1)
         {
-            return true;
+            return false;
         }
         getHomes(context);
         ActivityManager mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
