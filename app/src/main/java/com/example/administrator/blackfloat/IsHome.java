@@ -1,10 +1,15 @@
 package com.example.administrator.blackfloat;
 
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,15 +56,20 @@ public class IsHome {
     /**
      * 是否有黑名单程序
      */
-    public static boolean isapp(Context context, HashMap hashMap)
+    public static boolean isapp(final Context context, HashMap hashMap)
     {
         if (hashMap.size()<1)
         {
             return true;
         }
         getHomes(context);
-        ActivityManager mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> rti = mActivityManager.getRunningTasks(1);
-        return hashMap.containsValue(rti.get(0).topActivity.getPackageName());
+        if(Build.VERSION.SDK_INT < 21){
+            ActivityManager mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            final List<ActivityManager.RunningTaskInfo> rti = mActivityManager.getRunningTasks(1);
+            return hashMap.containsValue(rti.get(0).topActivity.getPackageName());
+        }else
+        {
+            return Usage.isRunningForeground5(context,hashMap);
+        }
     }
 }
