@@ -95,7 +95,7 @@ public class Floatservice extends Service {
                     handler.post(gonerunn);
                     continue;
                 }
-                if (floatView.getVisibility() == View.GONE && !IsHome.isapp(getApplicationContext(),hashMap)) {
+                if (floatView.getVisibility() == View.GONE && IsHome.isapp(getApplicationContext(),hashMap)) {
                     handler.post(visiblerunn);
                 }
             }
