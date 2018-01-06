@@ -35,6 +35,7 @@ public class Usage {
      * @param hashMap
      * @return
      */
+    static Boolean rebool =false;//上次返回的值
     public static boolean isRunningForeground5(Context context, HashMap hashMap) {
         long ts = System.currentTimeMillis();
         UsageStatsManager usageStatsManager = (UsageStatsManager)
@@ -42,7 +43,7 @@ public class Usage {
         List<UsageStats> queryUsageStats = usageStatsManager.queryUsageStats(
                 UsageStatsManager.INTERVAL_BEST, ts - 2000, ts);
         if (queryUsageStats == null || queryUsageStats.isEmpty()) {
-            return false;
+            return rebool;
         }
         UsageStats recentStats = null;
         for (UsageStats usageStats : queryUsageStats) {
@@ -51,9 +52,7 @@ public class Usage {
                 recentStats = usageStats;
             }
         }
-        if(hashMap.containsValue(recentStats.getPackageName())){
-            return true;
-        }
-        return false;
+        rebool = hashMap.containsValue(recentStats.getPackageName());
+        return rebool;
     }
 }
