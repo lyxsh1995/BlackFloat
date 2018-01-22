@@ -8,5 +8,4 @@
         } else {
             params.type = WindowManager.LayoutParams.TYPE_PHONE;
         }
-        
         params.format = PixelFormat.RGB_888;//不设置这个会花屏
