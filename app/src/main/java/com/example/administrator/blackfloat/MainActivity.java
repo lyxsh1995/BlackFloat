@@ -21,11 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    public static MainActivity mainActivitythis;
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 1101;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mainActivitythis =this;
         //判断是否安卓6.0
         if (Build.VERSION.SDK_INT >= 23) {
             //判断是否已经授权

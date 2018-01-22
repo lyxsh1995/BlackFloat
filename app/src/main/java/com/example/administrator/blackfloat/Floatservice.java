@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -70,19 +71,23 @@ public class Floatservice extends Service {
 
     private void startfloat() {
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-        floatView = new FloatView(getApplicationContext());
-        params.type = WindowManager.LayoutParams.TYPE_PHONE;
-//        params.format = PixelFormat.RGBA_8888;//设置背景透明
-        params.gravity = Gravity.LEFT | Gravity.TOP;
+        floatView = new FloatView(Floatservice.this);
+        if (Build.VERSION.SDK_INT >= 26) {//8.0新特性
+            params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            params.type = WindowManager.LayoutParams.TYPE_PHONE;
+        }
+        params.format = PixelFormat.RGB_888;
+//        params.gravity = Gravity.LEFT | Gravity.TOP;
         params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        params.width = LinearLayout.LayoutParams.MATCH_PARENT;
-        params.height = LinearLayout.LayoutParams.MATCH_PARENT;
-        params.x = 100;
-        params.y = 100;
+//        params.width = LinearLayout.LayoutParams.MATCH_PARENT;
+//        params.height = LinearLayout.LayoutParams.MATCH_PARENT;
+//        params.x = 100;
+//        params.y = 100;
         windowManager.addView(floatView, params);
     }
 
-    private Runnable runnable  = new Runnable() {
+    private Runnable runnable = new Runnable() {
         @Override
         public void run() {
             while (exit) {
@@ -95,7 +100,7 @@ public class Floatservice extends Service {
                     handler.post(gonerunn);
                     continue;
                 }
-                if (floatView.getVisibility() == View.GONE && IsHome.isapp(getApplicationContext(),hashMap)) {
+                if (floatView.getVisibility() == View.GONE && IsHome.isapp(getApplicationContext(), hashMap)) {
                     handler.post(visiblerunn);
                 }
             }
@@ -116,8 +121,7 @@ public class Floatservice extends Service {
     };
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         exit = false;
         windowManager.removeView(floatView);
     }
